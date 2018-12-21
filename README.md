@@ -17,4 +17,6 @@ Data da última revisão do documento: 21/12/2018
  b. verificar se existe um arquivo xlsx com o nome:
  c. Os resultados prévios são armazedos
  
- 4. ALgoritmo utilizado:
+ 4. Algoritmo utilizado: Classificador
+ Motivo: uma vez que tenho posts definidos previamente que são de direita, esquerda ou neutro. Utilizarei os mesmos para realizar um treinamento supervisionado.
+ 
