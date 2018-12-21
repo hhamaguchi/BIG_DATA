@@ -1,0 +1,203 @@
+!pip3 install -q numpy scipy pandas matplotlib twython
+!pip3 install --upgrade -q gspread
+
+# Import dependencies
+import pandas as pd
+import matplotlib.pyplot as plt
+from twython import Twython
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+
+# Auth GDrive
+from google.colab import auth
+auth.authenticate_user()
+
+import gspread
+from oauth2client.client import GoogleCredentials
+
+gc = gspread.authorize(GoogleCredentials.get_application_default())
+
+# Credentials
+APP_KEY = 'B6cZTTHoeMr96AFfOsbVM2lGG'
+APP_SECRET = 'QhGt5p4TsGVK8tOds1fWc7hEDIFfrgnTW94fenpl1WneWLWqfz'
+OAUTH_TOKEN = '167813147-tP4vOpAZFlcfRLlqXWMfRqcBW3yvjNpzRAborOUu'
+OAUTH_TOKEN_SECRET = '8UshaZNMspgdN2kRuSlkPbBJfYdu3UDzOzZt0R1F8JoU7'
+
+# Conn on twitter
+twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+#twitter.verify_credentials()
+#twitter.get_home_timeline()
+
+# Query on twitter
+def queryTwitterToDF(q):
+  query = { 'q': q, 'count': 100, 'lang': 'pt', 'result_type': 'mixed'}
+  result = twitter.search(**query)
+  dict_ = {'user': [],'text': [], 'favorite_count': []}  
+  for status in result['statuses']:  
+      dict_['user'].append(status['user'])
+      dict_['text'].append(status['text'])
+      dict_['favorite_count'].append(status['favorite_count'])
+  df = pd.DataFrame(dict_)  
+  df.sort_values(by='favorite_count')
+  return df
+
+df_direita = pd.concat([queryTwitterToDF('#alckmin'), queryTwitterToDF('#extremaesquerda'),
+                      queryTwitterToDF('#conservador'), queryTwitterToDF('#candidatodedireita'),
+                      queryTwitterToDF('#bolsomito'), queryTwitterToDF('#partidodedireita'),
+                      queryTwitterToDF('#PSDB'), queryTwitterToDF('#PFL'),
+                      queryTwitterToDF('#petralhas')], ignore_index=True)
+
+print(df_direita.shape)
+df_direita
+
+df_esquerda = pd.concat([queryTwitterToDF('#lula'), queryTwitterToDF('#extremadireita'),
+                      queryTwitterToDF('#lulalivre'), queryTwitterToDF('#candidatodeesquerda'),
+                      queryTwitterToDF('#haddad'), queryTwitterToDF('#partidodeesquerda'),
+                      queryTwitterToDF('#PT'), queryTwitterToDF('#golpe'),
+                      queryTwitterToDF('#coxinhas')], ignore_index=True)
+
+print(df_esquerda.shape)
+df_esquerda
+
+df_neutro = pd.concat([queryTwitterToDF('-#lula'), queryTwitterToDF('-#extremadireita'),
+                      queryTwitterToDF('-#lulalivre'), queryTwitterToDF('-#candidatodeesquerda'),
+                      queryTwitterToDF('-#haddad'), queryTwitterToDF('-#partidodeesquerda'),
+                      queryTwitterToDF('-#PT'), queryTwitterToDF('-#golpe'),
+                      queryTwitterToDF('-#coxinhas'), queryTwitterToDF('-#alckmin'), 
+                      queryTwitterToDF('-#extremaesquerda'), queryTwitterToDF('-#conservador'), 
+                      queryTwitterToDF('-#candidatodedireita'), queryTwitterToDF('-#bolsomito'), 
+                      queryTwitterToDF('-#partidodedireita'), queryTwitterToDF('-#PSDB'), queryTwitterToDF('-#PFL'),
+                      queryTwitterToDF('-#petralhas')], ignore_index=True)
+
+print(df_neutro.shape)
+df_neutro
+------------------------------------------------------------------------------
+sh = gc.open('twitter_politico')
+direita_sheet = sh.get_worksheet(0)
+esquerda_sheet = sh.get_worksheet(1)
+neutro_sheet = sh.get_worksheet(2)
+
+for index, row in df_direita.iterrows():
+  direita_sheet.update_acell('A' + str(index + 1), row['text'])
+
+for index, row in df_esquerda.iterrows():
+  esquerda_sheet.update_acell('A' + str(index + 1), row['text'])
+
+for index, row in df_neutro.iterrows():
+  neutro_sheet.update_acell('A' + str(index + 1), row['text'])
+  
+---------------------------------------------------------------------------
+APIError                                  Traceback (most recent call last)
+<ipython-input-81-2a201d5885fb> in <module>()
+      8 
+      9 for index, row in df_esquerda.iterrows():
+---> 10   esquerda_sheet.update_acell('A' + str(index + 1), row['text'])
+     11 
+     12 for index, row in df_neutro.iterrows():
+
+/usr/local/lib/python3.6/dist-packages/gspread/models.py in update_acell(self, label, value)
+    713 
+    714         """
+--> 715         return self.update_cell(*(a1_to_rowcol(label)), value=value)
+    716 
+    717     def update_cell(self, row, col, value):
+
+/usr/local/lib/python3.6/dist-packages/gspread/models.py in update_cell(self, row, col, value)
+    737             },
+    738             body={
+--> 739                 'values': [[value]]
+    740             }
+    741         )
+
+/usr/local/lib/python3.6/dist-packages/gspread/models.py in values_update(self, range, params, body)
+    174         """
+    175         url = SPREADSHEET_VALUES_URL % (self.id, quote(range))
+--> 176         r = self.client.request('put', url, params=params, json=body)
+    177         return r.json()
+    178 
+
+/usr/local/lib/python3.6/dist-packages/gspread/client.py in request(self, method, endpoint, params, data, json, files, headers)
+     77             return response
+     78         else:
+---> 79             raise APIError(response)
+     80 
+     81     def list_spreadsheet_files(self):
+
+APIError: {
+  "error": {
+    "code": 429,
+    "message": "Quota exceeded for quota group 'WriteGroup' and limit 'USER-100s' of service 'sheets.googleapis.com' for consumer 'project_number:32555940559'.",
+    "status": "RESOURCE_EXHAUSTED",
+    "details": [
+      {
+        "@type": "type.googleapis.com/google.rpc.Help",
+        "links": [
+          {
+            "description": "Google developer console API key",
+            "url": "https://console.developers.google.com/project/32555940559/apiui/credential"
+          }
+        ]
+      }
+    ]
+  }
+}  
+  
+  
+  
+  
+--------------------------------------------------------------------------------  
+  # Load data to DF.
+sh = gc.open('twitter_politico')
+direita_sheet = sh.get_worksheet(0)
+esquerda_sheet = sh.get_worksheet(1)
+
+# get_all_values gives a list of rows.
+dict_ = {'text': [], 'label': []}
+for row in direita_sheet.get_all_values():
+  dict_['text'].append(row[0])
+  dict_['label'].append(0)
+
+for row in esquerda_sheet.get_all_values():
+  dict_['text'].append(row[0])
+  dict_['label'].append(1)
+
+for row in neutro_sheet.get_all_values():
+  dict_['text'].append(row[0])
+  dict_['label'].append(2)
+  
+df = pd.DataFrame(dict_)
+
+df
+
+# Creating TDIDF Matrix
+count_vect = CountVectorizer()
+
+X_TF = count_vect.fit_transform(df['text'])
+
+tfidf_transformer = TfidfTransformer()
+X = tfidf_transformer.fit_transform(X_TF)
+print(type(X))
+print(X.shape)
+print(X)
+
+# Train ML
+from sklearn.naive_bayes import MultinomialNB
+clf = MultinomialNB().fit(X_TF, df['label'])
+
+# Predict
+docs_new = ['o lula deve ficar livre', 'politicos são corruptos', 'viva o FHC', 'fogsdsdo']
+X_new_counts = count_vect.transform(docs_new)
+X_new_tfidf = tfidf_transformer.transform(X_new_counts)
+
+predicted = clf.predict(X_new_tfidf)
+
+for doc, category in zip(docs_new, predicted):
+  if (category == 0):
+    print('%r => %s' % (doc, "direita"))
+  elif (category == 1):
+    print('%r => %s' % (doc, "esquerda"))
+  else:
+    print("neutro")
+    
+  
+  
