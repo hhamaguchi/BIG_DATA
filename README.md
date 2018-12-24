@@ -32,7 +32,7 @@ Data da última revisão do documento: 24/12/2018
  Motivo: uma vez que realizo uma classificação do twittes em direita, esquerda ou neutro, e pretendo utilizar esta informação (variável alvo) para um treinamento supervivionado,o classificador mostra-se uma possível solução. Em particular será adotado o classificador de Naive Bayes. O classificador de Naive Bayes assume que a presença de uma característica particular em uma classe não está relacionada com a presença de qualquer outra característica (regra de independência), o que simplifica o problema. De qualquer forma os classificadores Naive Bayes são muito utilizados em classificação de textos e costumam performar melhor que outras técnicas mais complexas. E explicando a última escolha do classificador, o "multinomial", é que ele considera quantas vezes uma determindada palavra apareceu no twittes, em contrapartida, por exemplo, o modelo de Bernoulli considera apenas o fato se uma determinada palavra apareceu ou não nos twittes.
 
  Limitações:
- a. O classificador está é muito sensível ao treinamento, se no treinamento uma palavra está em um dos twittes que eu classifiquei como "direita", essa mesma palavra pode aparecer num twitter com contexto de esquerda e classificar errado. Exemplo:  . 
+ a. O classificador é muito sensível ao treinamento, se no treinamento uma palavra está em um dos twittes que eu classifiquei como "direita", essa mesma palavra pode aparecer num twitter com contexto de esquerda e classificar errado. Exemplo:  . 
  b. Ao selecionar mais que 100 twittes para cada classificar, eu estava tendo um problema sistêmico de estouro de memória no Google Colab;
  c. O categoria neutra dificilmente é identificada, creio que pelo fato de que há necessidade de realizar um treinamento mais efetivo, de forma que se tire os twittes de direita e esquerda e quaisquer twittes relacionados a política.
  
@@ -46,8 +46,8 @@ Data da última revisão do documento: 24/12/2018
     a. função de captura_twitter
         inputs: usuario, twittes
         output: classificação dos twittes (0 - direita,1 - esquerda,2 -neutro)
-    b. função que armazenasse o classificador treinado/
+    b. função que armazenasse o classificador treinado
     c. função estatística
         input: vetor de categoria (esquerda, direita e neutro)
         output: variáveis de estatística descritiva, a principal seria uma probabilidade do usuário na castegoria ao qual foi classificado. A saída seria pode exemplo: "alanprando com 85% de probabilidade é de esquerda"
-        
+
