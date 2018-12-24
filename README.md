@@ -46,4 +46,8 @@ Data da última revisão do documento: 24/12/2018
     a. função de captura_twitter
         inputs: usuario, twittes
         output: classificação dos twittes (0 - direita,1 - esquerda,2 -neutro)
-    b. função que armazenasse o classificador treinado
+    b. função que armazenasse o classificador treinado/
+    c. função estatística
+        input: vetor de categoria (esquerda, direita e neutro)
+        output: variáveis de estatística descritiva, a principal seria uma probabilidade do usuário na castegoria ao qual foi classificado. A saída seria pode exemplo: "alanprando com 85% de probabilidade é de esquerda"
+        
