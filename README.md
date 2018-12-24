@@ -43,7 +43,7 @@ Data da última revisão do documento: 24/12/2018
  b. O classificador deveria ser treinado com uma amostra maior;
  c. Realizar uma limpeza nos twittes, alguns aparecem várias vezes e tem muitas palavras (conjunções, preposições) que não agregam para o classificador.
 
- Resposta do algoritmo: vale a ressalva que como classifico cada twitte que o mesmo posta, a resposta final é uma baseada na moda, ou seja, qual classificação apareceu mais.
+ Resposta do algoritmo: vale a ressalva que como classifico cada twitte que o usuário posta, a resposta final é uma baseada na moda, ou seja, qual classificação apareceu mais.
 
  5. Proposta de melhoria do projeto;
  O projeto poderia ser quebrado em funções:
